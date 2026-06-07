@@ -164,6 +164,15 @@ app.post("/create-checkout-session", async (req, res) => {
     res.json({
       sessionId: session.id,
       url: session.url,
+      product: {
+        priceId: price.id,
+        productId: price.product.id,
+        name: price.product.name,
+        description: price.product.description,
+        quantity,
+        amount: price.unit_amount * quantity,
+        currency: price.currency,
+      },
     });
   } catch (error) {
     console.error("create-checkout-session error:", error.message);
@@ -173,11 +182,19 @@ app.post("/create-checkout-session", async (req, res) => {
 
 app.get("/checkout-session/:id", async (req, res) => {
   try {
-    const session = await stripe.checkout.sessions.retrieve(req.params.id, {
-      expand: ["payment_intent"],
-    });
+    const [session, lineItems] = await Promise.all([
+      stripe.checkout.sessions.retrieve(req.params.id, {
+        expand: ["payment_intent"],
+      }),
+      stripe.checkout.sessions.listLineItems(req.params.id, {
+        expand: ["data.price.product"],
+      }),
+    ]);
 
     const paymentIntent = session.payment_intent;
+    const item = lineItems.data[0];
+    const price = item?.price;
+    const product = typeof price?.product === "object" ? price.product : null;
 
     res.json({
       sessionId: session.id,
@@ -187,6 +204,16 @@ app.get("/checkout-session/:id", async (req, res) => {
         typeof paymentIntent === "object" ? paymentIntent?.status : null,
       amountTotal: session.amount_total,
       currency: session.currency,
+      email: session.customer_email,
+      product: {
+        priceId: session.metadata?.price_id ?? price?.id ?? null,
+        productId: session.metadata?.product_id ?? product?.id ?? null,
+        name: session.metadata?.product_name ?? product?.name ?? null,
+        description: product?.description ?? null,
+        quantity: item?.quantity ?? null,
+        amount: item?.amount_total ?? session.amount_total,
+        currency: item?.currency ?? session.currency,
+      },
     });
   } catch (error) {
     console.error("checkout-session retrieve error:", error.message);

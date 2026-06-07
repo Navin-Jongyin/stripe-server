@@ -47,7 +47,7 @@ curl -X POST http://localhost:4242/create-checkout-session \
 - `email` — required
 - `successUrl` / `cancelUrl` — optional; defaults to `CLIENT_URL/payment/success` and `CLIENT_URL/payment/cancel`
 
-Returns `{ "sessionId": "...", "url": "https://checkout.stripe.com/..." }` — redirect the customer to `url`.
+Returns `{ "sessionId", "url", "product" }` — redirect the customer to `url`.
 
 ### Check payment status
 
@@ -55,7 +55,7 @@ Returns `{ "sessionId": "...", "url": "https://checkout.stripe.com/..." }` — r
 curl http://localhost:4242/checkout-session/cs_xxx
 ```
 
-Poll until `paymentStatus` is `"paid"` (PromptPay is async).
+Includes `product` with `priceId`, `productId`, `name`, `quantity`, `amount`, `currency`. Poll until `paymentStatus` is `"paid"` (PromptPay is async).
 
 ## Webhooks
 
