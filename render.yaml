@@ -11,7 +11,9 @@ services:
         sync: false
       - key: STRIPE_PUBLISHABLE_KEY
         sync: false
-      - key: STRIPE_WEBHOOK_SECRET
+      - key: ALLOWED_ORIGINS
         sync: false
-      - key: CLIENT_URL
+      - key: FRONTEND_URL
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
         sync: false
