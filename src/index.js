@@ -180,41 +180,59 @@ app.post("/create-checkout-session", async (req, res) => {
   }
 });
 
+async function getCheckoutSessionData(sessionId) {
+  const [session, lineItems] = await Promise.all([
+    stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["payment_intent"],
+    }),
+    stripe.checkout.sessions.listLineItems(sessionId, {
+      expand: ["data.price.product"],
+    }),
+  ]);
+
+  const paymentIntent = session.payment_intent;
+  const item = lineItems.data[0];
+  const price = item?.price;
+  const product = typeof price?.product === "object" ? price.product : null;
+
+  return {
+    sessionId: session.id,
+    status: session.status,
+    paymentStatus: session.payment_status,
+    paymentIntentStatus:
+      typeof paymentIntent === "object" ? paymentIntent?.status : null,
+    amountTotal: session.amount_total,
+    currency: session.currency,
+    email: session.customer_email,
+    product: {
+      priceId: session.metadata?.price_id ?? price?.id ?? null,
+      productId: session.metadata?.product_id ?? product?.id ?? null,
+      name: session.metadata?.product_name ?? product?.name ?? null,
+      description: product?.description ?? null,
+      quantity: item?.quantity ?? null,
+      amount: item?.amount_total ?? session.amount_total,
+      currency: item?.currency ?? session.currency,
+    },
+  };
+}
+
+app.get("/session-status", async (req, res) => {
+  try {
+    const sessionId = req.query.session_id;
+    if (!sessionId || typeof sessionId !== "string") {
+      return res.status(400).json({ error: "session_id is required" });
+    }
+
+    res.json(await getCheckoutSessionData(sessionId));
+  } catch (error) {
+    console.error("session-status error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.get("/checkout-session/:id", async (req, res) => {
   try {
-    const [session, lineItems] = await Promise.all([
-      stripe.checkout.sessions.retrieve(req.params.id, {
-        expand: ["payment_intent"],
-      }),
-      stripe.checkout.sessions.listLineItems(req.params.id, {
-        expand: ["data.price.product"],
-      }),
-    ]);
-
-    const paymentIntent = session.payment_intent;
-    const item = lineItems.data[0];
-    const price = item?.price;
-    const product = typeof price?.product === "object" ? price.product : null;
-
-    res.json({
-      sessionId: session.id,
-      status: session.status,
-      paymentStatus: session.payment_status,
-      paymentIntentStatus:
-        typeof paymentIntent === "object" ? paymentIntent?.status : null,
-      amountTotal: session.amount_total,
-      currency: session.currency,
-      email: session.customer_email,
-      product: {
-        priceId: session.metadata?.price_id ?? price?.id ?? null,
-        productId: session.metadata?.product_id ?? product?.id ?? null,
-        name: session.metadata?.product_name ?? product?.name ?? null,
-        description: product?.description ?? null,
-        quantity: item?.quantity ?? null,
-        amount: item?.amount_total ?? session.amount_total,
-        currency: item?.currency ?? session.currency,
-      },
-    });
+    res.json(await getCheckoutSessionData(req.params.id));
   } catch (error) {
     console.error("checkout-session retrieve error:", error.message);
     res.status(500).json({ error: error.message });

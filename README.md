@@ -27,7 +27,8 @@ Server runs at `http://localhost:4242`.
 | GET | `/config` | Returns publishable key |
 | GET | `/products` | Lists active one-time THB products and prices |
 | POST | `/create-checkout-session` | Creates a Checkout Session |
-| GET | `/checkout-session/:id` | Get checkout session status |
+| GET | `/session-status?session_id=cs_xxx` | Get checkout session status (query param) |
+| GET | `/checkout-session/:id` | Get checkout session status (path param) |
 | POST | `/webhook` | Stripe webhook endpoint |
 
 ### Create checkout session
