@@ -1,3 +1,4 @@
+This is stripe server for Sully-Test
 # Practice Games — Stripe PromptPay Server
 
 API-only Node.js server for **Practice Games** (cognitive training hub). Deployed on Render; frontend calls it by URL.
