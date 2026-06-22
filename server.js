@@ -138,7 +138,7 @@ app.post("/create-checkout-session", async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       locale: "th",
-      payment_method_types: ["promptpay"],
+      payment_method_types: ["card", "promptpay"],
       customer_email: email.trim().toLowerCase(),
       client_reference_id: userId || authUid || undefined,
       metadata: {
