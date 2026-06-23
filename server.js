@@ -135,10 +135,16 @@ app.post("/create-checkout-session", async (req, res) => {
       return res.status(400).json({ error: "Redirect URL not allowed" });
     }
 
+    const price = await stripe.prices.retrieve(priceId);
+    if (price.currency !== "thb") {
+      return res.status(400).json({ error: "Only THB prices are supported" });
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       locale: "th",
       payment_method_types: ["card", "promptpay"],
+      adaptive_pricing: { enabled: false },
       customer_email: email.trim().toLowerCase(),
       client_reference_id: userId || authUid || undefined,
       metadata: {
