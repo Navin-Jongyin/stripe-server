@@ -2,8 +2,6 @@ function parsePlanDurationDays(planName = "") {
   const trimmed = String(planName).trim();
   const name = trimmed.toLowerCase();
 
-  if (/^test(\s+product)?$/i.test(trimmed)) return 5;
-
   const monthMatch = name.match(/(\d+)\s*month/);
   if (monthMatch) return Number(monthMatch[1]) * 30;
 
@@ -15,7 +13,12 @@ function parsePlanDurationDays(planName = "") {
   if (/\b6\s*month/.test(name)) return 180;
   if (/\b1\s*year\b|\b12\s*month|\bannual\b/.test(name)) return 365;
 
-  return 30;
+  // Short access for test products without a year/month plan in the name
+  if (/^test(\s+product)?$/i.test(trimmed) || /\btest\b/.test(name)) {
+    return 5;
+  }
+
+  return 365;
 }
 
 function getFirebaseAdmin() {

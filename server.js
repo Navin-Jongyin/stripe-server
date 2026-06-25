@@ -76,6 +76,10 @@ app.get("/config", (_req, res) => {
   });
 });
 
+function isOneYearPlanName(name = "") {
+  return /\b1\s*year\b/i.test(String(name));
+}
+
 app.get("/products", async (_req, res) => {
   try {
     const prices = await stripe.prices.list({
@@ -89,7 +93,8 @@ app.get("/products", async (_req, res) => {
         (price) =>
           price.currency === "thb" &&
           typeof price.product === "object" &&
-          price.product.active,
+          price.product.active &&
+          isOneYearPlanName(price.product.name),
       )
       .map((price) => ({
         priceId: price.id,
