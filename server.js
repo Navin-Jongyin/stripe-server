@@ -76,9 +76,8 @@ app.get("/config", (_req, res) => {
   });
 });
 
-function isOneYearPlanName(name = "") {
-  return /\b1\s*year\b/i.test(String(name));
-}
+const LISTED_PRODUCT_ID =
+  process.env.STRIPE_PRODUCT_ID || "prod_UiJY0mHvWacyD7";
 
 app.get("/products", async (_req, res) => {
   try {
@@ -94,7 +93,7 @@ app.get("/products", async (_req, res) => {
           price.currency === "thb" &&
           typeof price.product === "object" &&
           price.product.active &&
-          isOneYearPlanName(price.product.name),
+          price.product.id === LISTED_PRODUCT_ID,
       )
       .map((price) => ({
         priceId: price.id,
