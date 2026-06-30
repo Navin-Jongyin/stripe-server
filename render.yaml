@@ -11,6 +11,8 @@ services:
         sync: false
       - key: STRIPE_PUBLISHABLE_KEY
         sync: false
+      - key: STRIPE_PAYMENT_METHOD_CONFIGURATION
+        sync: false
       - key: ALLOWED_ORIGINS
         sync: false
       - key: FRONTEND_URL

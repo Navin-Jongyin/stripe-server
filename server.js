@@ -77,7 +77,10 @@ app.get("/config", (_req, res) => {
 });
 
 const LISTED_PRODUCT_ID =
-  process.env.STRIPE_PRODUCT_ID || "prod_UiJY0mHvWacyD7";
+  process.env.STRIPE_PRODUCT_ID || "prod_UngORZTMW1MX2B";
+const PAYMENT_METHOD_CONFIGURATION =
+  process.env.STRIPE_PAYMENT_METHOD_CONFIGURATION ||
+  "pmc_1To559G8qWAkDmi6Ruol9iqd";
 
 app.get("/products", async (_req, res) => {
   try {
@@ -147,7 +150,10 @@ app.post("/create-checkout-session", async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       locale: "th",
-      payment_method_types: ["card", "promptpay"],
+      payment_method_configuration: PAYMENT_METHOD_CONFIGURATION,
+      wallet_options: {
+        link: { display: "never" },
+      },
       adaptive_pricing: { enabled: false },
       customer_email: email.trim().toLowerCase(),
       client_reference_id: userId || authUid || undefined,
