@@ -85,3 +85,5 @@ Returns `501` with `{ "fallbackClient": true }` if Firebase Admin is not configu
 - [ ] `ALLOWED_ORIGINS` includes dev + production URLs
 - [ ] Card and PromptPay enabled in Stripe Dashboard (THB)
 - [ ] Test: checkout → success → Firestore `users/{id}` has `paid: true`
+
+
