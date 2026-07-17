@@ -77,7 +77,7 @@ app.get("/config", (_req, res) => {
 });
 
 const LISTED_PRODUCT_ID =
-  process.env.STRIPE_PRODUCT_ID || "prod_UngORZTMW1MX2B";
+  process.env.STRIPE_PRODUCT_ID || "prod_Utz2L5XoRI7JDT";
 const PAYMENT_METHOD_CONFIGURATION =
   process.env.STRIPE_PAYMENT_METHOD_CONFIGURATION ||
   "pmc_1To559G8qWAkDmi6Ruol9iqd";
