@@ -36,7 +36,7 @@ npm run dev
 | GET | `/health` | `{ "status": "ok" }` |
 | GET | `/config` | Publishable key |
 | GET | `/products` | Active THB Stripe prices |
-| POST | `/create-checkout-session` | Create PromptPay Checkout session |
+| POST | `/create-checkout-session` | Create Checkout session (card + PromptPay) |
 | GET | `/session-status?session_id=cs_xxx` | Payment + product status |
 | POST | `/activate-subscription` | Activate Firestore subscription (Admin SDK) |
 
@@ -83,5 +83,7 @@ Returns `501` with `{ "fallbackClient": true }` if Firebase Admin is not configu
 - [ ] `GET /session-status` returns `product` object
 - [ ] `FIREBASE_SERVICE_ACCOUNT_JSON` set on Render
 - [ ] `ALLOWED_ORIGINS` includes dev + production URLs
-- [ ] PromptPay enabled in Stripe Dashboard (THB)
+- [ ] Card and PromptPay enabled in Stripe Dashboard (THB)
 - [ ] Test: checkout → success → Firestore `users/{id}` has `paid: true`
+
+

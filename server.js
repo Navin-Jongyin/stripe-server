@@ -76,6 +76,12 @@ app.get("/config", (_req, res) => {
   });
 });
 
+const LISTED_PRODUCT_ID =
+  process.env.STRIPE_PRODUCT_ID || "prod_Utz2L5XoRI7JDT";
+const PAYMENT_METHOD_CONFIGURATION =
+  process.env.STRIPE_PAYMENT_METHOD_CONFIGURATION ||
+  "pmc_1To559G8qWAkDmi6Ruol9iqd";
+
 app.get("/products", async (_req, res) => {
   try {
     const prices = await stripe.prices.list({
@@ -89,7 +95,8 @@ app.get("/products", async (_req, res) => {
         (price) =>
           price.currency === "thb" &&
           typeof price.product === "object" &&
-          price.product.active,
+          price.product.active &&
+          price.product.id === LISTED_PRODUCT_ID,
       )
       .map((price) => ({
         priceId: price.id,
@@ -135,10 +142,19 @@ app.post("/create-checkout-session", async (req, res) => {
       return res.status(400).json({ error: "Redirect URL not allowed" });
     }
 
+    const price = await stripe.prices.retrieve(priceId);
+    if (price.currency !== "thb") {
+      return res.status(400).json({ error: "Only THB prices are supported" });
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       locale: "th",
-      payment_method_types: ["promptpay"],
+      payment_method_configuration: PAYMENT_METHOD_CONFIGURATION,
+      wallet_options: {
+        link: { display: "never" },
+      },
+      adaptive_pricing: { enabled: false },
       customer_email: email.trim().toLowerCase(),
       client_reference_id: userId || authUid || undefined,
       metadata: {
