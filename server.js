@@ -165,6 +165,7 @@ app.post("/create-checkout-session", async (req, res) => {
   }
 });
 
+
 app.get("/session-status", async (req, res) => {
   try {
     const sessionId = req.query.session_id || req.query.sessionId;
